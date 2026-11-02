@@ -61,7 +61,7 @@
         {id: "l2", delta: 3, reason: "welcome", job_id: null, project_id: null, project_title: null, created_at: day(9)}]});
       if (p === "/api/account/payments") return json(200, {payments: []});
       if (p === "/api/projects") return json(200, {projects: projects});
-      if (p === "/api/connections") return json(200, {publishing_enabled: true, platforms_enabled: {youtube: true, instagram: true, tiktok: true}, connections: [
+      if (p === "/api/connections") return json(200, {publishing_enabled: true, youtube_audited: true, platforms_enabled: {youtube: true, instagram: true, tiktok: true}, connections: [
         {platform: "youtube", status: "connected", handle: "Демо-канал"}, {platform: "instagram", status: "connected", handle: "demo"}, {platform: "tiktok", status: "revoked"}]});
       var m = p.match(/^\/api\/jobs\/([^/]+)$/);
       if (m) return json(200, jobOf(m[1]));
