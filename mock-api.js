@@ -12,7 +12,7 @@
       last_job: job ? {job_id: job, status: jobStatus || "done", type: "render_final", created_at: day(n)} : null};
   };
   var projects = [
-    row("p1", "6 из 8 приёмов за смену", "done", 0, "pic-0"),
+    Object.assign(row("p1", "Соцсеть, куда пускают только ИИ", "draft", 0, "ai-network"), {committed_at: null, last_job: {job_id: "ai-network", status: "done", type: "render_preview", created_at: day(0)}}),
     row("p2", "Как считать калории по фото", "done", 1, "pic-1"),
     row("p3", "Рассталась и начала бизнес", "running", 1, "pic-2", "running"),
     row("p4", "Анализ тарелки за 5 секунд", "done", 3, "pic-3"),
@@ -21,6 +21,8 @@
     row("p7", "Старый ролик про дедлайны", "done", 9, "pic-0"),
   ];
   var jobOf = function (id) {
+    if (id === "ai-network") return {job_id: id, slug: "p1", status: "done", type: "render_preview", created_at: day(0), updated_at: day(0), stages: [{stage: "render_preview", status: "done"}],
+      artifacts: [{kind: "cover", key: "c", bytes: 1, url: BASE + "/fixtures/ai-network/t0.jpg"}]};
     var n = (id.match(/pic-(\d)/) || [0, "0"])[1], running = n === "2";
     return {job_id: id, slug: projects[{0:0,1:1,2:2,3:3}[n]].title, status: running ? "running" : "done", type: "render_final", created_at: day(1), updated_at: day(0),
       stages: [{stage: "render_final", status: running ? "running" : "done"}],
@@ -28,7 +30,7 @@
         {kind: "master", key: "demo/video-" + n + ".mp4", bytes: 14000000, duration_s: 45, url: BASE + "/mock/" + n + ".mp4", download_url: BASE + "/mock/" + n + ".mp4"},
         {kind: "cover", key: "demo/cover-" + n + ".jpg", bytes: 40000, url: BASE + "/mock/" + n + ".jpg", download_url: BASE + "/mock/" + n + ".jpg"}]};
   };
-  var brand = {logo_key: null, logo_url: null, colors: {bg: null, fg: null, accent: "#FFD21E"}, font_key: null, caption_style: "pop", links: {telegram: null, cta: null}};
+  var brand = {logo_key: null, logo_url: null, colors: {bg: null, fg: null, accent: "#FFD21E"}, font_key: null, caption_style: "pop", links: {telegram: "https://t.me/montyfastnews", cta: "telegram"}};
   var META = {title: "6 из 8 приёмов за смену", description: "Демо-описание ролика.", source: "transcript",
     youtube: {title: "6 из 8 приёмов за смену", description: "Демо-описание для YouTube.", tags: ["монтаж", "reels"]},
     instagram: {caption: "Демо-подпись для Instagram #монтаж"}, tiktok: {title: "Демо-подпись для TikTok #монтаж"}};
@@ -51,7 +53,7 @@
     if (p === "/auth/logout") { toast(); return json(200, {}); }
     if (p === "/api/brand") return json(200, brand);
     if (method === "GET") {
-      if (p === "/api/me") return json(200, {id: "demo", email: "demo@example.com", name: "Демо", auth_provider: "google", plan_tier: "free"});
+      if (p === "/api/me") return json(200, {id: "demo", email: "demo@example.com", name: "Демо", auth_provider: "google", plan_tier: /\/publish/.test(location.pathname) ? "creator" : "free"});
       if (p === "/api/admin/me") return json(200, {email: "demo@example.com", is_admin: false});
       if (p === "/api/account") return json(200, {balance: 56, billing: {enabled: true, packs: [{bananas: 10, price_cents: 2500}, {bananas: 30, price_cents: 6500}, {bananas: 100, price_cents: 19000}]}, free_balance: 3, free_cap: 3});
       if (p === "/api/account/ledger") return json(200, {entries: [
