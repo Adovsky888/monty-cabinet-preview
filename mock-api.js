@@ -22,7 +22,7 @@
   ];
   var jobOf = function (id) {
     var n = (id.match(/pic-(\d)/) || [0, "0"])[1], running = n === "2";
-    return {job_id: id, slug: "p" + n, status: running ? "running" : "done", type: "render_final", created_at: day(1), updated_at: day(0),
+    return {job_id: id, slug: projects[{0:0,1:1,2:2,3:3}[n]].title, status: running ? "running" : "done", type: "render_final", created_at: day(1), updated_at: day(0),
       stages: [{stage: "render_final", status: running ? "running" : "done"}],
       artifacts: running ? [{kind: "cover", key: "c", bytes: 1, url: BASE + "/mock/" + n + ".jpg"}] : [
         {kind: "master", key: "demo/video-" + n + ".mp4", bytes: 14000000, duration_s: 45, url: BASE + "/mock/" + n + ".mp4", download_url: BASE + "/mock/" + n + ".mp4"},
@@ -65,7 +65,7 @@
       if (m) return json(200, jobOf(m[1]));
       if (/^\/api\/jobs\/[^/]+\/publish-meta$/.test(p)) return json(200, META);
     }
-    if (method !== "GET") toast();
+    if (method !== "GET") { toast(); return json(400, {error: "demo_mock", error_code: "demo_mock", error_id: "E-DEMO"}); }
     return json(404, {error: "not_found", error_code: "not_found", error_id: "E-DEMO"});
   };
   var realFetch = window.fetch.bind(window);
@@ -93,7 +93,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     var pill = document.createElement("div");
     pill.textContent = "Макет · данные тестовые";
-    pill.style.cssText = "position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:99998;background:rgba(0,0,0,.65);color:#fff;padding:4px 12px;border-radius:999px;font:600 11px system-ui;pointer-events:none";
+    pill.style.cssText = "position:fixed;right:84px;bottom:26px;z-index:99998;background:rgba(0,0,0,.65);color:#fff;padding:4px 12px;border-radius:999px;font:600 11px system-ui;pointer-events:none";
     document.body.appendChild(pill);
   });
 })();
