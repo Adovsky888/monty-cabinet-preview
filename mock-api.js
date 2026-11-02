@@ -12,7 +12,7 @@
       last_job: job ? {job_id: job, status: jobStatus || "done", type: "render_final", created_at: day(n)} : null};
   };
   var projects = [
-    row("p1", "Монти это монтажёр, сценарист и SMM", "done", 0, "pic-0"),
+    row("p1", "6 из 8 приёмов за смену", "done", 0, "pic-0"),
     row("p2", "Как считать калории по фото", "done", 1, "pic-1"),
     row("p3", "Рассталась и начала бизнес", "running", 1, "pic-2", "running"),
     row("p4", "Анализ тарелки за 5 секунд", "done", 3, "pic-3"),
@@ -29,8 +29,8 @@
         {kind: "cover", key: "demo/cover-" + n + ".jpg", bytes: 40000, url: BASE + "/mock/" + n + ".jpg", download_url: BASE + "/mock/" + n + ".jpg"}]};
   };
   var brand = {logo_key: null, logo_url: null, colors: {bg: null, fg: null, accent: "#FFD21E"}, font_key: null, caption_style: "pop", links: {telegram: null, cta: null}};
-  var META = {title: "Монти это монтажёр, сценарист и SMM", description: "Демо-описание ролика.", source: "transcript",
-    youtube: {title: "Монти это монтажёр, сценарист и SMM", description: "Демо-описание для YouTube.", tags: ["монтаж", "reels"]},
+  var META = {title: "6 из 8 приёмов за смену", description: "Демо-описание ролика.", source: "transcript",
+    youtube: {title: "6 из 8 приёмов за смену", description: "Демо-описание для YouTube.", tags: ["монтаж", "reels"]},
     instagram: {caption: "Демо-подпись для Instagram #монтаж"}, tiktok: {title: "Демо-подпись для TikTok #монтаж"}};
   var json = function (code, body) { return new Response(JSON.stringify(body), {status: code, headers: {"content-type": "application/json"}}); };
   var toastEl;
