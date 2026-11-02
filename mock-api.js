@@ -53,7 +53,7 @@
     if (p === "/auth/logout") { toast(); return json(200, {}); }
     if (p === "/api/brand") return json(200, brand);
     if (method === "GET") {
-      if (p === "/api/me") return json(200, {id: "demo", email: "demo@example.com", name: "Демо", auth_provider: "google", plan_tier: /\/publish/.test(location.pathname) ? "creator" : "free"});
+      if (p === "/api/me") return json(200, {id: "demo", email: "demo@example.com", name: "Демо", auth_provider: "google", plan_tier: /\/publish/.test(location.pathname) ? "creator" : "free", can_publish: true});
       if (p === "/api/admin/me") return json(200, {email: "demo@example.com", is_admin: false});
       if (p === "/api/account") return json(200, {balance: 56, billing: {enabled: true, packs: [{bananas: 10, price_cents: 2500}, {bananas: 30, price_cents: 6500}, {bananas: 100, price_cents: 19000}]}, free_balance: 3, free_cap: 3});
       if (p === "/api/account/ledger") return json(200, {entries: [
