@@ -1,0 +1,99 @@
+// Clickable mockup: there is no backend here. Every API call is answered in the browser with demo data.
+(function () {
+  var BASE = "/monty-cabinet-preview";
+  try {
+    if (!document.cookie.includes("monty_lang=")) document.cookie = "monty_lang=ru;path=/";
+    if (!localStorage.getItem("monty_lang")) localStorage.setItem("monty_lang", "ru");
+    if (!localStorage.getItem("monty_theme")) localStorage.setItem("monty_theme", "dark");
+  } catch (e) {}
+  var day = function (n) { return new Date(Date.now() - n * 864e5).toISOString(); };
+  var row = function (slug, title, status, n, job, jobStatus) {
+    return {slug: slug, title: title, status: status, entry_flow: "upload", created_at: day(n), committed_at: job ? day(n) : null, has_bound_source: !!job,
+      last_job: job ? {job_id: job, status: jobStatus || "done", type: "render_final", created_at: day(n)} : null};
+  };
+  var projects = [
+    row("p1", "Монти это монтажёр, сценарист и SMM", "done", 0, "pic-0"),
+    row("p2", "Как считать калории по фото", "done", 1, "pic-1"),
+    row("p3", "Рассталась и начала бизнес", "running", 1, "pic-2", "running"),
+    row("p4", "Анализ тарелки за 5 секунд", "done", 3, "pic-3"),
+    row("p5", "Запись 3.MOV", "draft", 4, null),
+    row("p6", "Три ошибки в первых секундах", "done", 6, "pic-1"),
+    row("p7", "Старый ролик про дедлайны", "done", 9, "pic-0"),
+  ];
+  var jobOf = function (id) {
+    var n = (id.match(/pic-(\d)/) || [0, "0"])[1], running = n === "2";
+    return {job_id: id, slug: "p" + n, status: running ? "running" : "done", type: "render_final", created_at: day(1), updated_at: day(0),
+      stages: [{stage: "render_final", status: running ? "running" : "done"}],
+      artifacts: running ? [{kind: "cover", key: "c", bytes: 1, url: BASE + "/mock/" + n + ".jpg"}] : [
+        {kind: "master", key: "demo/video-" + n + ".mp4", bytes: 14000000, duration_s: 45, url: BASE + "/mock/" + n + ".mp4", download_url: BASE + "/mock/" + n + ".mp4"},
+        {kind: "cover", key: "demo/cover-" + n + ".jpg", bytes: 40000, url: BASE + "/mock/" + n + ".jpg", download_url: BASE + "/mock/" + n + ".jpg"}]};
+  };
+  var brand = {logo_key: null, logo_url: null, colors: {bg: null, fg: null, accent: "#FFD21E"}, font_key: null, caption_style: "pop", links: {telegram: null, cta: null}};
+  var META = {title: "Монти это монтажёр, сценарист и SMM", description: "Демо-описание ролика.", source: "transcript",
+    youtube: {title: "Монти это монтажёр, сценарист и SMM", description: "Демо-описание для YouTube.", tags: ["монтаж", "reels"]},
+    instagram: {caption: "Демо-подпись для Instagram #монтаж"}, tiktok: {title: "Демо-подпись для TikTok #монтаж"}};
+  var json = function (code, body) { return new Response(JSON.stringify(body), {status: code, headers: {"content-type": "application/json"}}); };
+  var toastEl;
+  var toast = function () {
+    if (!document.body) return;
+    if (!toastEl) {
+      toastEl = document.createElement("div");
+      toastEl.style.cssText = "position:fixed;left:50%;top:18px;transform:translateX(-50%);z-index:99999;background:#FFD21E;color:#161512;padding:10px 18px;border-radius:999px;font:600 14px system-ui;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:90vw;text-align:center";
+      toastEl.textContent = "Это макет: действие не выполняется";
+      document.body.appendChild(toastEl);
+    }
+    toastEl.style.display = "block";
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { toastEl.style.display = "none"; }, 2600);
+  };
+  var route = function (p, method) {
+    if (p === "/api/client-events" || p === "/auth/refresh" || p === "/api/release") return json(200, {});
+    if (p === "/auth/logout") { toast(); return json(200, {}); }
+    if (p === "/api/brand") return json(200, brand);
+    if (method === "GET") {
+      if (p === "/api/me") return json(200, {id: "demo", email: "demo@example.com", name: "Демо", auth_provider: "google", plan_tier: "free"});
+      if (p === "/api/admin/me") return json(200, {email: "demo@example.com", is_admin: false});
+      if (p === "/api/account") return json(200, {balance: 56, billing: {enabled: true, packs: [{bananas: 10, price_cents: 2500}, {bananas: 30, price_cents: 6500}, {bananas: 100, price_cents: 19000}]}, free_balance: 3, free_cap: 3});
+      if (p === "/api/account/ledger") return json(200, {entries: [
+        {id: "l1", delta: -1, reason: "run", job_id: null, project_id: null, project_title: "Как считать калории по фото", created_at: day(1)},
+        {id: "l2", delta: 3, reason: "welcome", job_id: null, project_id: null, project_title: null, created_at: day(9)}]});
+      if (p === "/api/account/payments") return json(200, {payments: []});
+      if (p === "/api/projects") return json(200, {projects: projects});
+      if (p === "/api/connections") return json(200, {publishing_enabled: true, platforms_enabled: {youtube: true, instagram: true, tiktok: true}, connections: [
+        {platform: "youtube", status: "connected", handle: "Демо-канал"}, {platform: "instagram", status: "connected", handle: "demo"}, {platform: "tiktok", status: "revoked"}]});
+      var m = p.match(/^\/api\/jobs\/([^/]+)$/);
+      if (m) return json(200, jobOf(m[1]));
+      if (/^\/api\/jobs\/[^/]+\/publish-meta$/.test(p)) return json(200, META);
+    }
+    if (method !== "GET") toast();
+    return json(404, {error: "not_found", error_code: "not_found", error_id: "E-DEMO"});
+  };
+  var realFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    var url = new URL(typeof input === "string" ? input : input.url || String(input), location.href);
+    var p = url.pathname.indexOf(BASE) === 0 ? url.pathname.slice(BASE.length) : url.pathname;
+    if (url.origin === location.origin && /^\/(api|auth|v1)\//.test(p)) {
+      var method = ((init && init.method) || (input && input.method) || "GET").toUpperCase();
+      return Promise.resolve(route(p, method));
+    }
+    return realFetch(input, init);
+  };
+  window.EventSource = function (u) {
+    var self = this, id = (String(u).match(/jobs\/([^/]+)\/events/) || [0, "pic-0"])[1];
+    this.readyState = 1; this.close = function () { this.readyState = 2; };
+    this.addEventListener = function (type, fn) { if (type === "message") this._m = fn; };
+    this.removeEventListener = function () {};
+    setTimeout(function () {
+      var ev = {data: JSON.stringify(jobOf(id))};
+      if (self.onopen) self.onopen({});
+      if (self._m) self._m(ev);
+      if (self.onmessage) self.onmessage(ev);
+    }, 60);
+  };
+  document.addEventListener("DOMContentLoaded", function () {
+    var pill = document.createElement("div");
+    pill.textContent = "Макет · данные тестовые";
+    pill.style.cssText = "position:fixed;left:50%;bottom:10px;transform:translateX(-50%);z-index:99998;background:rgba(0,0,0,.65);color:#fff;padding:4px 12px;border-radius:999px;font:600 11px system-ui;pointer-events:none";
+    document.body.appendChild(pill);
+  });
+})();
